@@ -8,13 +8,15 @@ The current local build (`0.0.11-savebackups`) was tested offline. A Fight Now m
 
 ## Build and run
 
-This is an early source snapshot adapted from a UFC 3 runtime. Some upstream scripts and documents still use UFC 3 terminology, and the build/release flow needs a clean-room review before a community release. Use `scripts/build-windows.sh` as a starting point only after reviewing its requirements and paths. You must provide your own game dump locally. Never commit game files, extracted content, saves, local logs, screenshots containing private information, or compiled game packages.
+Download the Windows ZIP from [Releases](https://github.com/schans-arg/UFC4-PC-Port/releases), extract the complete archive, and open `UFC4.exe`. On first launch, select `eboot.bin` from your own extracted UFC 4 copy. The measured profile is CUSA14209 v28.00 (base and update combined). Python and runtime dependencies are included. New caches, logs, saves and save backups are created locally.
+
+See [BUILD-COMMUNITY.md](BUILD-COMMUNITY.md) for the measured donor runtime, extension build and portable launcher commands. This preview uses the UFC3Native v0.1.5 binary renderer plus the UFC4 extension; a complete independent renderer rebuild is still pending. Inherited UFC 3 build scripts are reference material. Never upload game files, extracted content, saves, private logs or compiled game images.
 
 See `docs/PORT_STATUS.md` for tested behavior, outstanding issues, and release checklist.
 
 ## License and attribution
 
-The runtime and integrated renderer are distributed under GPL-2.0; see `LICENSE`, `THIRD_PARTY_NOTICES.md`, and file-level notices. Third-party components retain their own licenses and notices. The project incorporates the renderer from UFC3Native v0.1.5; attribution and notice obligations for that component need final review before the first public release. See `THIRD_PARTY_NOTICES.md`.
+The runtime and integrated renderer are distributed under GPL-2.0; see `LICENSE`, `THIRD_PARTY_NOTICES.md`, and file-level notices. Third-party components retain their own licenses and notices. The project incorporates the renderer from UFC3Native v0.1.5; runtime packages preserve the upstream licenses and identify the donor and extension hashes.
 
 This is an independent community project. EA SPORTS, UFC, PlayStation, and related marks belong to their respective owners. This project is not affiliated with or endorsed by EA or Sony. The source license grants no rights to the game or its assets.
 
