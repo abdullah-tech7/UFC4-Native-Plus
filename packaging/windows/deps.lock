@@ -1,0 +1,26 @@
+# donor Supermedo/bloodborne_pc ec8340a9f9d809436cf07fa1f07b08affa9c13e3 (mechanisms adapted; read, not merged)
+# SacredFire Windows cross-build inputs. One entry per line: name kind source ref [licence] [role]
+#   kind archive: a downloaded file, ref = sha256:<hex> (verified; "sha256:-" means not pinned yet,
+#                 scripts/windows/fetch-deps.sh --pin records what it downloaded)
+#   kind git:     a repository checked out at the exact commit in ref (submodules included)
+# role: toolchain (runs on the Linux host), target (compiled for Windows), header (headers only),
+#       host-tool (runs on Linux during the build), runtime (shipped in the package, not compiled).
+# Versions follow the Linux build on 2026-10-11 (Arch: SDL 3.4.18, Vulkan 1.4.363, fmt 12.2.0,
+# xxHash 0.8.4, miniz 3.1.2, Zydis 4.1.1, Boost 1.92.0, robin-map 1.4.x; tools/deps.sh: VMA 3.3.0,
+# magic_enum 0.9.7, xbyak 7.30). FFmpeg is not an input: CTR imports no AvPlayer/videodec function
+# (out/import_names.txt), so the Windows build leaves the AvPlayer sources out (BB_AVPLAYER=OFF).
+llvm-mingw archive https://github.com/mstorsjo/llvm-mingw/releases/download/20261006/llvm-mingw-20261006-ucrt-ubuntu-22.04-x86_64.tar.xz sha256:5f9c6ed95b2d4bdb2869a488c5fd5857fbdabcf288a0aa3eb1da43f6a08d8ab4 Apache-2.0-with-LLVM-exception/ZPL(mingw-w64) toolchain
+boost archive https://github.com/boostorg/boost/releases/download/boost-1.92.0/boost-1.92.0-cmake.tar.xz sha256:9bed76128d4e46755dbe818487788c6fceb6f72b378f4daa49b7e1e600d9088d BSL-1.0 header
+python-embed archive https://www.python.org/ftp/python/3.13.16/python-3.13.16-embed-amd64.zip sha256:97dae5274cc54867065e8d5a3226e48c35017ed332a0fdb0e27d5b5821961297 PSF-2.0 runtime
+vulkan-1.def archive https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/9e9518d2cf00054a220ae1a40f4406804b420ef5/loader/vulkan-1.def sha256:9ba339b7f5ee2df28487698a6840ecf095fac58b415c2c89ad9f161e9d316378 Apache-2.0 target
+Vulkan-Headers git https://github.com/KhronosGroup/Vulkan-Headers.git 6802bb4733b63ed5efd3adb308a6c885ef180ea1 Apache-2.0/MIT header
+SDL git https://github.com/libsdl-org/SDL.git 829a65d769d935c4852f8159e964312c0957260a Zlib target
+fmt git https://github.com/fmtlib/fmt.git 1be298e1bd68957e4cd352e1f676f00e07dcfb57 MIT target
+xxHash git https://github.com/Cyan4973/xxHash.git c87183a77d67f7d37e3d2d1b7eaac5e7c695e4f0 BSD-2-Clause target
+zydis git https://github.com/zyantific/zydis.git a2278f1d254e492f6a6b39f6cb5d1f5d515659dc MIT target
+miniz git https://github.com/richgel999/miniz.git 77d0dce8627735138c51770d1799a1ef48f2117d MIT target
+VulkanMemoryAllocator git https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git 1d8f600fd424278486eade7ed3e877c99f0846b1 MIT header
+magic_enum git https://github.com/Neargye/magic_enum.git e046b69a3736d314fad813e159b1c192eaef92cd MIT header
+xbyak git https://github.com/herumi/xbyak.git 9d8ff37306f39c6a71cf998078cbe880ce5dc224 BSD-3-Clause header
+robin-map git https://github.com/Tessil/robin-map.git 4ec1bf19c6a96125ea22062f38c2cf5b958e448e MIT header
+aerolib.inl archive https://raw.githubusercontent.com/shadps4-emu/shadPS4/b4e7ae776071ceb1dd35004577a8719481e1d258/src/core/aerolib/aerolib.inl sha256:d6238bf50d18c17cab2009bf073ee93b378a63292836de55e08a3841b3b371c5 GPL-2.0-or-later runtime

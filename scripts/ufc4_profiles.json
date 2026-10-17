@@ -1,0 +1,34 @@
+{
+  "ea0ef73a0919fc54a309af2c62f92a3a45dfeb955f3c8f83df93fce43401f928": {
+    "name": "ufc4",
+    "game": "EA SPORTS UFC 4",
+    "title": "CUSA14209",
+    "version": "01.00",
+    "update": "CUSA14209-patch",
+    "modules": [
+      "libc.prx",
+      "libSceFios2.prx"
+    ],
+    "patches": false,
+    "module_sha256": {
+      "libc.prx": "1c58fcf5779ed4dd39f8d84dfad136cf94c9ed242ebf44d3555b3f1540761799",
+      "libSceFios2.prx": "32d367e5b7226a036e3ef936cbb9732364ccce54ad6af89c9f720104115e5122"
+    }
+  },
+  "83cfbe26711d6759556bba42a835e52450ec58117fe0a2fad33edfcd6c46981f": {
+    "name": "ufc4",
+    "game": "EA SPORTS UFC 4",
+    "title": "CUSA14209",
+    "version": "28.00",
+    "update": "CUSA14209-patch",
+    "modules": [
+      "libc.prx",
+      "libSceFios2.prx"
+    ],
+    "patches": false,
+    "module_sha256": {
+      "libc.prx": "1c58fcf5779ed4dd39f8d84dfad136cf94c9ed242ebf44d3555b3f1540761799",
+      "libSceFios2.prx": "32d367e5b7226a036e3ef936cbb9732364ccce54ad6af89c9f720104115e5122"
+    }
+  }
+}

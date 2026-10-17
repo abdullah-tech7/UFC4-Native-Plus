@@ -1,0 +1,100 @@
+Vendored from https://github.com/shadps4-emu/shadPS4 commit b4e7ae776071ceb1dd35004577a8719481e1d258 (GPL-2.0-or-later).
+Directories: src/video_core, src/shader_recompiler, src/common, src/core/libraries/{gnmdriver,videoout}, externals/gcn, externals/sirit, externals/half.
+Also: src/core/libraries/kernel/{orbis_error,posix_error,time,process,equeue}.h, equeue.cpp, src/core/libraries/error_codes.h, src/core/platform.h, src/core/libraries/system/{userservice,systemservice}.h.
+Also: src/core/libraries/avplayer (without the handle streamer), src/core/libraries/videodec/video_utils.{h,cpp}.
+Local changes are marked with "bbport:" comments.
+Backported from upstream after b4e7ae7 (2026-10-02), recompiler correctness fixes only:
+  233562929 V_INTERP_MOV_F32 P10/P20 selectors (#5087), d96278e1e compute shader floating-point
+  mode (#5126), e518a6515 S_SUBB_U32 SCC wrap (#5031), 282e5c792 S_ADDC_U32 SCC carry-out (#5030),
+  fb6367d29 32-bit literals in the high dword of 64-bit floats (#5114), 94e217781 V_BFM_B32 (#5185),
+  d1cb90dbb ADDC (#5200), dd43d1cac V_CVT_PK_U8_F32 (#5194), ef08b1e1f V_ALIGNBIT/ALIGNBYTE (#5186).
+Backported for UFC-4 (recompiler batch T1 of docs/ufc3/MANCELLI-BACKPORT.md), one line per commit:
+  c49529087 NaN handling: legacy variants, unordered v_cmp_n*, DX10_CLAMP, NaN-aware med3 (#5257);
+    externals/sirit gains OpNClamp (GLSLstd450NClamp) in gpu/third_party/sirit (in-tree, no submodule).
+  5dedb48f (mancelli) RuntimeInfo::Properties::num_allocated_vgprs gets 9 bits (fixes #5257 truncating 256 to 0).
+  7721a1ef instance id unbiased for every instance id use, step rates too (#5260; by hand, our fetch_data is std::optional).
+  10393d2c step rates allowed together with a base instance (#5274).
+  c5dd8b8b ZERO/ONE blend factors emulated for MIN/MAX blend ops (#5197).
+  c34ca21f EXEC scope preserved after an empty branch (#5220).
+  1c2b8f97 V_RCP_CLAMP_F32, V_RSQ_CLAMP_F32, V_RSQ_LEGACY_F32, V_LOG_CLAMP_F32 (#5346).
+  02d3b06d (mancelli) v_min/v_max (FPMin/FPMax 32/64) as NMin/NMax, redone on top of #5257 as in mancelli's fork.
+
+Backported video_core fixes (UFC-5):
+  14ada48a pending fast clears on FMASK decompress (#5283, Claudio Godoi).
+  789551b0 (mancelli's fork) fast clear elimination clears a never-rendered MSAA image; the
+  SHADPS4_FMASK_DECOMPRESS switch is not taken (#5283 already runs it unconditionally).
+  c08218db (mancelli's fork) depth bias x256 for emulated Z16+S8; ufc3: the factor follows the
+  host format (x1 for a real D16 with BB_Z16S8_AS_D16=1).
+  72251298 (mancelli's fork) depth read as a color format: only the Z32 -> R32_UINT case and
+  freeing copies with their image, on top of ufc3's DepthAsR16 (per-layer 2D views, AMD 0003).
+
+Backported for UFC-6 (T6a of docs/ufc3/MANCELLI-BACKPORT.md, created fighter skin):
+  01b32f45 (mancelli's fork) parts 1, 2 and 4: a BC view of an uncompressed image goes through
+  memory (TileImageToBuffer into the buffer cache, the BC image uploads from there); storage
+  aliases are written back before a BC image is created over them; a compatible-format view with
+  more mips/layers expands the cached image. SHADPS4_BC_MODE (default 3) as in the fork. Not taken:
+  part 3 (flush of GPU images before CPU writes, page_manager: T6b) and the write back after
+  dispatches (StorageImageSync, which ufc3 does not have). Barrier recorded through Record()
+  (threaded recording); "[T6a]" lines in stdout, once per address.
+
+Backported for UFC-7 (T7 of docs/ufc3/MANCELLI-BACKPORT.md):
+  69ab1996 (mancelli's fork) DB_ALPHA_TO_MASK emulated: alphaToCoverageEnable on multisampled
+  targets (new pipeline key bit), 2x2 dither discard of MRT0 in the fragment shader with one
+  sample. ufc3: the switch is BB_ALPHA_TO_MASK=0 (not SHADPS4_ALPHA_TO_MASK); the mode is chosen
+  from the samples of the bound targets before the stages compile (the fork reads the key's
+  num_samples there, which is still the depth samples); "[T7]" log once per pixel shader.
+  Cache versions: ShaderBinaryVersion 11, ShaderMetaVersion 10, PipelineKeyVersion 7.
+  Second pass: the register is left set across draws, so it is honoured only like the hardware
+  does: not when DB_SHADER_CONTROL.ALPHA_TO_MASK_DISABLE is set, MRT0 exports no alpha or the
+  pixel shader has no MRT0 export (UFC 3 torso came out black). BB_ALPHA_TO_MASK_SKIP=<ps hashes>
+  leaves pixel shaders out; the "[T7]" line goes to stdout (Render_Vulkan info is filtered).
+  Third pass: the torso stayed dark with only one pixel shader using the emulation (the hair, on
+  a 4x MSAA R11G11B10F target through alphaToCoverage). Multisampled targets now take the shader
+  dither too (whole pixels, all samples alike); BB_ALPHA_TO_MASK=coverage brings back
+  alphaToCoverage. "[T7] draw" lines: each distinct draw honouring the register (stages, targets,
+  T#s and V#s of the pixel shader), first 64. Cache versions unchanged (same key layout, same
+  shader for a given runtime info).
+  Fourth pass: two draws use the alpha-to-mask pixel shader 39d6a7df (alpha = material constant
+  x red of a mask on the second UV set). One samples block-compressed assets (the head hair); the
+  other (23682 indices) samples the fighter's skin baked at run time (1024x1024 8_8_8_8 sRGB): it
+  is the visible torso skin. With full coverage the torso is right; dithered by its alpha it
+  shows what lies under it (dark, ending at the clavicle). By default draws sampling a 2D
+  8_8_8_8 sRGB texture keep full coverage (log "off (baked albedo)"); BB_ALPHA_TO_MASK=all turns
+  that guard off. BB_ALPHA_TO_MASK_DRAWS=<indices>,... emulates only those draws (-n: all but n;
+  setting it drops the guard). "[T7] draw" now also lists draws left out, with dwords 20-24 of
+  small constant buffers (alpha scale). "[T7] trace": on the 120th frame with such draws
+  (BB_T7_TRACE_AFTER, 0: never) every draw of two frames rendering to or sampling their colour or
+  depth target, in order. Pending: why the torso alpha is low here (alpha scale, mask, second UV
+  set) and what draws the dark layer under it.
+  Fifth pass: the user's A/B shows the 23682-index draw is the long hair (BB_ALPHA_TO_MASK_DRAWS=
+  23682 fixes it) and that the torso goes dark even with no draw emulated (=_DRAWS=1), which =0
+  does not do. The baked-albedo guard is gone (it excluded every long hairstyle: all sample a
+  run-time 8_8_8_8 sRGB colour map). Every gate, _SKIP and _DRAWS included, is now decided before
+  the stages compile: the fourth pass compiled and bound the dither variant of a draw it then left
+  out, and went through the stage selection twice. The [T7] trace is off by default
+  (BB_T7_TRACE_AFTER unset or 0; its frames skip the prepared pipelines), and the "[T7] draw"
+  constant-buffer dwords are read on the GPU thread only. A draw left out now takes exactly the
+  BB_ALPHA_TO_MASK=0 path. Cache versions unchanged.
+  Sixth pass: the user's A/B (_DRAWS=23682: hair and torso right; default: torso dark) puts the
+  dark torso on the other 39d6a7df draw, which samples only authored block-compressed maps (t3
+  512x512 BC3 sRGB colour), while every hairstyle samples the hair colour map the game composites
+  at run time (t3 8_8_8_8 sRGB, BGRA). Index counts do not tell them apart (a short hairstyle also
+  has 6456 indices). Colour-map rule (default): DB_ALPHA_TO_MASK is emulated only when the pixel
+  shader samples an uncompressed 8_8_8_8 sRGB texture (log "off (no 8_8_8_8 sRGB colour map)");
+  BB_ALPHA_TO_MASK=all or _DRAWS turn it off. The plain stages are selected first and the dither
+  variant only for a draw that takes it, so a draw left out keeps the =0 path. Pending: why that
+  draw's alpha (b2 dword 24 = 2 x red of t4, a BC1 sRGB mask on the second UV set) is low here.
+  The fourth pass's guard was this rule inverted (hair square, torso dark).
+  UFC-12: the colour-map rule left out all the hair and beards of the fights (square black
+  cards): there every 39d6a7df/a4856d46 draw samples BC colour maps, authored or compressed by the
+  game on the GPU ("[T6a] BC view Bc3SrgbBlock over R32G32B32A32Uint ... GPU-written"; mips stop at
+  one 4x4 block, hence 8 mips at 512x512, 9 at 1024x1024). The torso draw (6456 indices) samples
+  one of those GPU-compressed maps too (t3 0x1039292500 in the 0.1.3 log), like the created
+  fighter's hair in a fight (4800 and 23682 indices: t3 GPU-compressed BC3, same t1, t4, VS,
+  b2[20..22]); no T#, mip count, constant or MRT count tells them apart. The alpha is not the
+  cause: MRT0 alpha = b2 dword 24 x red of t4 (BC1 sRGB, UV = Param0.zw = second UV vertex input),
+  and the console degammas an sRGB T# like Vulkan does. Every run that showed that torso dark
+  (UFC-7 passes 4-6, Windows g17f300d) was built without UFC-6, when GPU-compressed textures, the
+  created fighter's skin among them, were not read through memory: dithered, the layer shows the
+  skin under it. Default now: no rule (=all is the same); BB_ALPHA_TO_MASK=colourmap brings the
+  UFC-7 rule back. Cache versions unchanged.

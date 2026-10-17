@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- UFC-45 experiment: native 4K scene (3840x2160) on the game's own Favor Resolution path.
+     NOT a default. scripts/patches.py reads patches/*.xml only (no recursion), so this file is
+     never seen unless BB_PATCHES_DIR points at this folder, and it is isEnabled="false": it applies
+     only when the experiment's patches-4k.json names it (BB_PATCHES_CONFIG). tools/ufc45-4k-test.sh
+     sets both; docs/ufc3/UFC-45-4K-TEST.md has the evidence and the rollback.
+
+     Site: the 1800p branch of the render-size selector at eboot vaddr 0x533180 (taken with
+     sceKernelIsNeoMode, VideoOut open and its height 0x870 = 2160; that is PS4 Pro + VideoOut
+     3840x2160). The branch at 0x533227 loads:
+       0x533227 c7 00 80 0c 00 00   mov dword [S+0x38], 3200   -> scene width  (VideoOutTex_High)
+       0x53322d 41 b8 80 0c 00 00   mov r8d, 3200              -> desc+0x5c (High width)
+       0x533233 b8 38 04 00 00      mov eax, 1080              -> S+0x4c/0x54, desc+0x94 (output/UI)
+       0x533238 b9 80 07 00 00      mov ecx, 1920              -> S+0x48/0x50, desc+0x90 (output/UI)
+       0x53323d bb 84 03 00 00      mov ebx, 900               -> S+0x44
+       0x533242 bf 40 06 00 00      mov edi, 1600              -> S+0x40
+       0x533247 ba 08 07 00 00      mov edx, 1800              -> S+0x3c, desc+0x60 (High height)
+     Only the three 3200/1800 immediates change (3200 -> 3840, 1800 -> 2160). 1920x1080 (UI,
+     output, desc+0x78/0x7c and +0x90/0x94) and 1600x900 stay. Addresses are vaddr + 0x400000
+     (patches.py EBOOT_BASE); Signature is the whole branch from the 0x870 compare, call rel32
+     masked, original immediates included, so a different build or an already-changed eboot
+     matches nowhere and the patch is skipped whole. -->
+<Patch>
+    <TitleID>
+        <ID>CUSA06534</ID>
+    </TitleID>
+    <Metadata Title="EA SPORTS UFC 3"
+              Name="UFC-45 4K scene on Favor Resolution"
+              Note="Experiment: Pro + VideoOut 2160 + Favor Resolution renders the scene at 3840x2160 instead of 3200x1800; UI and output stay 1920x1080."
+              Author="ufc3-native UFC-45"
+              PatchVer="0.1"
+              AppVer="01.14"
+              AppElf="eboot.bin"
+              isEnabled="false">
+        <PatchList>
+            <Line Type="bytes32" Address="0x00933229" Value="0x00000f00"
+                  Signature="81 7d a4 70 08 00 00 0f 94 c3 20 c3 e8 ?? ?? ?? ?? 49 8d 46 38 84 db 41 88 5e 67 74 30 c7 00 80 0c 00 00 41 b8 80 0c 00 00 b8 38 04 00 00 b9 80 07 00 00 bb 84 03 00 00 bf 40 06 00 00 ba 08 07 00 00 eb 31" SignatureOffset="0x1f"/>
+            <Line Type="bytes32" Address="0x0093322f" Value="0x00000f00"
+                  Signature="81 7d a4 70 08 00 00 0f 94 c3 20 c3 e8 ?? ?? ?? ?? 49 8d 46 38 84 db 41 88 5e 67 74 30 c7 00 80 0c 00 00 41 b8 80 0c 00 00 b8 38 04 00 00 b9 80 07 00 00 bb 84 03 00 00 bf 40 06 00 00 ba 08 07 00 00 eb 31" SignatureOffset="0x25"/>
+            <Line Type="bytes32" Address="0x00933248" Value="0x00000870"
+                  Signature="81 7d a4 70 08 00 00 0f 94 c3 20 c3 e8 ?? ?? ?? ?? 49 8d 46 38 84 db 41 88 5e 67 74 30 c7 00 80 0c 00 00 41 b8 80 0c 00 00 b8 38 04 00 00 b9 80 07 00 00 bb 84 03 00 00 bf 40 06 00 00 ba 08 07 00 00 eb 31" SignatureOffset="0x3e"/>
+        </PatchList>
+    </Metadata>
+</Patch>

@@ -1,0 +1,26 @@
+# UFC 3 settings: KEY=value, one per line (an empty value keeps the default).
+# A variable set in the environment when starting ufc3.sh wins over this file.
+
+# Fullscreen: 1 on, 0 windowed
+BB_FULLSCREEN=0
+# FPS limit: 60, 120, 144, 240 or 0 (unlimited; the game's own cap is 240)
+BB_FPS_LIMIT=0
+# Present mode: Mailbox, Fifo (vsync) or Immediate (uncapped, may tear)
+BB_PRESENT_MODE=Mailbox
+# Window size for 2K / 4K: 2560x1440 or 3840x2160 (the game's 1080p frame is scaled to it).
+# Fullscreen uses the monitor's size.
+BB_WINDOW_SIZE=
+# Upscaling with AMD FSR 1.0 (1 on) and RCAS sharpening (1 on; attenuation 200 sharp .. 2000 soft)
+BB_FSR1=0
+BB_RCAS=0
+BB_RCAS_ATTENUATION=500
+# Skip the EA intro and the first-start video: 1 skip, 0 play them
+BB_SKIP_MOVIES=1
+# The player name the game shows (16 ASCII characters)
+BB_USER_NAME=Player 1
+# The monitor: its number (1, 2, ...) or part of its name
+BB_DISPLAY=
+
+# Join an online server from the CLI (LAN or VPN IPv4 address; empty = offline).
+# Graphical Host/Join settings are saved in launcher.json.
+BB_ONLINE_SERVER=

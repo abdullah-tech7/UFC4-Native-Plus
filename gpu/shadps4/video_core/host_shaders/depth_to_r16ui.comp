@@ -1,0 +1,32 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+// ufc3: a depth image read by a guest shader through an R16_UINT view (the raw bits of its Z16
+// depth on the console). The host image is D16_UNORM or D32_SFLOAT(_S8), which cannot be viewed
+// as R16_UINT, so the bits are rebuilt into an R16_UINT copy: round(depth * 65535).
+// R32=1: a Z32 depth read through R32_UINT, rebuilt as the float bits (shadPS4 72251298).
+#version 450
+#extension GL_EXT_samplerless_texture_functions : require
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+layout(binding = 0) uniform texture2D depth_tex;
+#ifdef R32
+layout(binding = 1, r32ui) uniform writeonly uimage2D out_img;
+#else
+layout(binding = 1, r16ui) uniform writeonly uimage2D out_img;
+#endif
+
+layout(push_constant) uniform Push { uvec2 extent; } push;
+
+void main() {
+    const uvec2 p = gl_GlobalInvocationID.xy;
+    if (any(greaterThanEqual(p, push.extent))) {
+        return;
+    }
+#ifdef R32
+    const uint value = floatBitsToUint(texelFetch(depth_tex, ivec2(p), 0).x);
+#else
+    const float z = clamp(texelFetch(depth_tex, ivec2(p), 0).x, 0.0, 1.0);
+    const uint value = uint(round(z * 65535.0));
+#endif
+    imageStore(out_img, ivec2(p), uvec4(value, 0u, 0u, 1u));
+}

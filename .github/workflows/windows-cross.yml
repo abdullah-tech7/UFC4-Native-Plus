@@ -1,0 +1,59 @@
+# SacredFire: the Windows x86-64 build made on Linux, source only (no game data), on demand
+# and for pushes to main. It downloads the pinned inputs of packaging/windows/deps.lock, builds
+# the sysroot and the executables, runs the ABI probe under Wine as a diagnostic, and keeps the
+# candidate archive as a workflow artifact (BB_ALLOW_DIRTY: CI checkouts are not tagged builds).
+# Native Windows acceptance is a separate, manual step (docs/sacredfire/13-windows-port-report.md).
+name: windows-cross
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/**', 'gpu/**', 'scripts/**', 'cmake/**', 'packaging/windows/**', '.github/workflows/windows-cross.yml']
+
+jobs:
+  cross-build:
+    name: Linux-hosted Windows build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Host tools
+        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build glslang-tools python3 wine64
+      - name: Cache pinned inputs and sysroot
+        uses: actions/cache@v4
+        with:
+          path: |
+            out/windows/downloads
+            out/windows/deps/src
+            out/windows/sysroot
+            out/windows/toolchain
+          key: windows-inputs-${{ hashFiles('packaging/windows/deps.lock', 'scripts/windows/build-deps.sh') }}
+      - name: Fetch and verify inputs
+        run: bash scripts/windows/fetch-deps.sh
+      - name: Target libraries
+        run: bash scripts/windows/build-deps.sh
+      - name: Executables
+        run: bash scripts/build-windows.sh --runtime
+      - name: Probes and runtime tests (built)
+        run: bash scripts/build-windows.sh --tests
+      - name: ABI probe under Wine (diagnostic)
+        # Ubuntu 24.04's wine64 package installs the binary as `wine`; older ones as `wine64`.
+        # A diagnostic: the probe needs the toolchain's DLLs beside it, and Wine is not Windows.
+        continue-on-error: true
+        run: |
+          wine=$(command -v wine || command -v wine64)
+          cp out/windows/toolchain/llvm-mingw-*/x86_64-w64-mingw32/bin/{libwinpthread-1.dll,libc++.dll,libunwind.dll} out/windows/tests/ 2>/dev/null || true
+          WINEDEBUG=-all "$wine" out/windows/tests/abi_probe.exe
+      - name: Candidate archive
+        run: BB_ALLOW_DIRTY=1 bash scripts/package-windows.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SacredFire-windows-x86_64-candidate
+          path: |
+            dist/SacredFire-windows-x86_64.zip
+            dist/SacredFire-windows-x86_64.zip.sha256
+            dist/SacredFire-windows-x86_64.zip.build.txt
+            out/windows/tests/*.exe

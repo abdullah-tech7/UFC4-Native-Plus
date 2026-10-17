@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <wchar.h>
+static const wchar_t package_root[] = L@PACKAGE_ROOT@;
+int WINAPI wWinMain(HINSTANCE instance,HINSTANCE previous,LPWSTR args,int show) {
+    (void)instance;(void)previous;(void)show;
+    wchar_t executable[32768],command[32768];
+    if (swprintf(executable,32768,L"%ls\\UFC4.exe",package_root)<0 ||
+        swprintf(command,32768,L"\"%ls\" %ls",executable,args)<0) return 2;
+    STARTUPINFOW si={.cb=sizeof(si)}; PROCESS_INFORMATION process={0};
+    if (!CreateProcessW(executable,command,NULL,NULL,FALSE,0,NULL,package_root,&si,&process)) {
+        MessageBoxW(NULL,L"No se pudo abrir UFC 4. La carpeta UFC4Native-offline debe permanecer en su ubicacion original.",
+                    L"UFC 4 offline",MB_ICONERROR); return 2;
+    }
+    WaitForSingleObject(process.hProcess,INFINITE);
+    DWORD code=1;GetExitCodeProcess(process.hProcess,&code);
+    CloseHandle(process.hProcess);CloseHandle(process.hThread);return (int)code;
+}
