@@ -99,15 +99,3 @@ Unless a file or component states otherwise, changes to GPL-licensed portions ar
 EA SPORTS, UFC, PlayStation, and related names and marks belong to their respective owners. This is an unofficial community project and is not affiliated with or endorsed by those owners.
 
 Use this software at your own risk. Compatibility is not guaranteed across all game editions, updates, hardware, or configurations.
-
-## Reporting issues
-
-When reporting a problem, include:
-
-- Game edition and update/version
-- Windows version
-- CPU, GPU, and graphics driver
-- Fork/release version
-- Steps to reproduce and relevant logs
-
-Remove personal paths, account identifiers, and other private information from logs. Never attach game dumps, extracted game content, DLC files, or save files to an issue.
