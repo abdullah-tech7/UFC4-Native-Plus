@@ -21,23 +21,23 @@ In the developer's own testing, no crashes were observed during the tested sessi
 
 ### Launcher
 
-![UFC4 Native Plus Launcher](doc/images/u1.png)
+![UFC4 Native Plus Launcher](docs/images/u1.png)
 
 ### Fighter selection
 
-![Fighter selection](doc/images/u2.png)
+![Fighter selection](docs/images/u2.png)
 
 ### Fighter roster
 
-![Fighter roster](doc/images/u3.png)
+![Fighter roster](docs/images/u3.png)
 
 ### Fighter comparison
 
-![Fighter comparison](doc/images/u4.png)
+![Fighter comparison](docs/images/u4.png)
 
 ### Gameplay
 
-![Gameplay](doc/images/u5.png)
+![Gameplay](docs/images/u5.png)
 
 ## Supported game editions
 
