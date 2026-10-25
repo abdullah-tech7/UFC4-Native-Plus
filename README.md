@@ -100,11 +100,16 @@ EA SPORTS, UFC, PlayStation, and related names and marks belong to their respect
 
 Use this software at your own risk. Compatibility is not guaranteed across all game editions, updates, hardware, or configurations.
 
-## Community & Support
+## 🥊 Community & Support
 
-Join the UFC4 Native Plus Discord channels for updates, announcements, support, and bug reports.
+Join the **Dynasty Team Discord** to stay updated on UFC4 Native Plus, get support, and report bugs.
 
-- **Updates & Announcements:** [View Updates](https://discord.com/channels/1471891718155669779/1563955456467144815)
-- **Support & Bug Reports:** [Get Support](https://discord.com/channels/1471891718155669779/1563955494052176013)
+**🔔 Updates & Announcements**
 
-Follow the updates channel for new releases, improvements, and announcements. If you encounter any issues, visit the support channel for assistance.
+Head over to **#Update_UFC4-Native-Plus** for new releases, improvements, and project announcements.
+
+**🛠️ Support & Bug Reports**
+
+Visit **#Support_UFC4-Native-Plus** for troubleshooting, technical assistance, and bug reports.
+
+**💬 Join the Community:** [Dynasty Team Discord](https://discord.gg/8qCwnGRpH)
