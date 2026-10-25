@@ -99,3 +99,12 @@ Unless a file or component states otherwise, changes to GPL-licensed portions ar
 EA SPORTS, UFC, PlayStation, and related names and marks belong to their respective owners. This is an unofficial community project and is not affiliated with or endorsed by those owners.
 
 Use this software at your own risk. Compatibility is not guaranteed across all game editions, updates, hardware, or configurations.
+
+## Community & Support
+
+Join the UFC4 Native Plus Discord channels for updates, announcements, support, and bug reports.
+
+- **Updates & Announcements:** [View Updates](https://discord.com/channels/1471891718155669779/1563955456467144815)
+- **Support & Bug Reports:** [Get Support](https://discord.com/channels/1471891718155669779/1563955494052176013)
+
+Follow the updates channel for new releases, improvements, and announcements. If you encounter any issues, visit the support channel for assistance.
