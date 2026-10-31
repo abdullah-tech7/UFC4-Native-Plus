@@ -1,4 +1,20 @@
-![Downloads](https://img.shields.io/github/downloads/abdullah-tech7/UFC4-Native-Plus/total)
+<p align="center">
+
+![Downloads](https://img.shields.io/github/downloads/abdullah-tech7/UFC4-Native-Plus/total?style=for-the-badge&logo=github&label=Downloads)
+
+![Latest Release](https://img.shields.io/github/v/release/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge)
+
+![Release Date](https://img.shields.io/github/release-date/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge)
+
+![Stars](https://img.shields.io/github/stars/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&logo=github)
+
+![Forks](https://img.shields.io/github/forks/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge)
+
+![Watchers](https://img.shields.io/github/watchers/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge)
+
+![Issues](https://img.shields.io/github/issues/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge)
+
+</p>
 
 # UFC4 Native Plus
 
