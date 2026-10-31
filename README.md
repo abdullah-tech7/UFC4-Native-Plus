@@ -5,7 +5,8 @@
   <img src="https://img.shields.io/github/v/release/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&label=Latest%20Release" />
   <img src="https://img.shields.io/github/license/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&label=License" />
 </p>
-# UFC4 Native Plus
+
+## UFC4 Native Plus
 
 A community-maintained fork of [UFC4-PC-Port](https://github.com/schans-arg/UFC4-PC-Port), adding support for both the US and EU game editions, an optional DLC-related runtime patch, and a launcher for configuring the port.
 
