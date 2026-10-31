@@ -1,21 +1,11 @@
 <p align="center">
-
-![Downloads](https://img.shields.io/github/downloads/abdullah-tech7/UFC4-Native-Plus/total?style=for-the-badge&logo=github&label=Downloads)
-
-![Latest Release](https://img.shields.io/github/v/release/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge)
-
-![Release Date](https://img.shields.io/github/release-date/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge)
-
-![Stars](https://img.shields.io/github/stars/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&logo=github)
-
-![Forks](https://img.shields.io/github/forks/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge)
-
-![Watchers](https://img.shields.io/github/watchers/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge)
-
-![Issues](https://img.shields.io/github/issues/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge)
-
+  <img src="https://img.shields.io/github/downloads/abdullah-tech7/UFC4-Native-Plus/total?style=for-the-badge&logo=github&label=Downloads" />
+  <img src="https://img.shields.io/github/v/release/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&label=Latest%20Release" />
+  <img src="https://img.shields.io/github/release-date/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&label=Release%20Date" />
+  <img src="https://img.shields.io/github/stars/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&logo=github&label=Stars" />
+  <img src="https://img.shields.io/github/watchers/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&label=Watchers" />
+  <img src="https://img.shields.io/github/license/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&label=License" />
 </p>
-
 # UFC4 Native Plus
 
 A community-maintained fork of [UFC4-PC-Port](https://github.com/schans-arg/UFC4-PC-Port), adding support for both the US and EU game editions, an optional DLC-related runtime patch, and a launcher for configuring the port.
