@@ -1,5 +1,7 @@
 <p align="center">
   <img src="https://img.shields.io/github/downloads/abdullah-tech7/UFC4-Native-Plus/total?style=for-the-badge&logo=github&label=Downloads" />
+    <img src="https://img.shields.io/github/stars/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&logo=github&label=Stars" />
+
   <img src="https://img.shields.io/github/v/release/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&label=Latest%20Release" />
   <img src="https://img.shields.io/github/license/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&label=License" />
 </p>
