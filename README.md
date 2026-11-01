@@ -51,50 +51,10 @@ This is an unofficial community project. It is not affiliated with, endorsed by,
 - Resolution and graphics configuration options.
 - Convenient setup and launch workflow.
 
-## Release History
+## Release
 
 See the [Releases](https://github.com/abdullah-tech7/UFC4-Native-Plus/releases) page for downloads and complete release notes.
 
-### v1.0.1 — Stability & Performance Update
-- Fixed freezing issues affecting some systems.
-- Added **540p internal resolution** for lower-end GPUs and systems.
-- Improved memory management to reduce memory usage on resource-constrained systems.
-- Added further performance optimizations for smoother and more responsive gameplay.
-
-### v1.0.0 — First Stable Release
-
-The first stable release introduced major gameplay, audio, performance, and stability improvements.
-
-**New Features**
-- Added DLC fighter support in Career Mode.
-- Added two-controller support.
-
-**Audio Improvements**
-- Increased the center dialogue channel by +3 dB.
-- Added an adaptive soft limiter to reduce audio peaks and clipping.
-- Added launcher volume control from 75% to 200%.
-
-**Performance & Graphics**
-- Improved overall performance.
-- Fixed stuttering and frame pacing issues during fights.
-- Improved strike, hit animation, and visual effects smoothness.
-- Optimized memory usage for different GPUs and VRAM configurations.
-- Added 720p resolution support.
-- Improved 2K and 4K resolutions.
-- Added automatic resolution handling in PS4 Pro mode.
-
-**Fixes & Stability**
-- Fixed Career Mode sparring issues.
-- Fixed first-launch crashes.
-- Fixed crashes occurring on some systems when selecting fighters.
-- Fixed numerous reported bugs and issues.
-- Significantly reduced crashes during testing.
-
-### v0.0.1 — Initial Release
-- Added support for US and EU game editions.
-- Introduced performance and stability improvements.
-- Added an optional DLC-related runtime patch.
-- Introduced the dedicated launcher for configuring available options.
 
 ## Screenshots
 
