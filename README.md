@@ -5,39 +5,91 @@
   <img src="https://img.shields.io/github/license/abdullah-tech7/UFC4-Native-Plus?style=for-the-badge&label=License" />
 </p>
 
-# UFC4 Native Plus
+# 🥊 UFC4 Native Plus
 
 A community-maintained fork of [UFC4-PC-Port](https://github.com/schans-arg/UFC4-PC-Port), bringing EA SPORTS UFC 4 to Windows with support for both US and EU game editions, performance and stability improvements, an optional DLC-related runtime patch, and a dedicated launcher.
 
 **Project Status: Stable / Playable**
 
-UFC4 Native Plus reached its first stable release with v1.0.0. Subsequent updates continue to improve compatibility, performance, and stability.
+UFC4 Native Plus reached its first stable release with v1.0.0. Subsequent updates continue to improve compatibility, performance, graphics, and gameplay customization.
 
 This is an unofficial community project. It is not affiliated with, endorsed by, or sponsored by EA SPORTS, UFC, Sony, or PlayStation.
 
-## Features
+## ✨ Features
 
-### Game Compatibility
+### 🎮 Game Compatibility
+
 - **US and EU Edition Support:** Supports both North American and European game editions.
 - **Game Update v28.00:** Targets the supported v28.00 update for both editions.
 - **DLC Fighters in Career Mode:** Use DLC fighters in Career Mode without requiring separate DLC files.
-- **Two-Controller Support:** Play with two controllers.
+- **Two-Controller Support:** Play locally with two controllers, with separate configurations for each player.
 
-### Performance & Graphics
+### 🖥️ Display & Resolution
+
+- **Fixed Internal Resolution Scaling:** Resolution options now apply their actual rendering dimensions inside the game.
+- **Multiple Internal Resolutions:** Choose between 480p, 540p, 720p, 900p, 1080p, 1440p, and True 4K.
+- **True 4K Support:** Render the game at native 4K internal resolution.
+- **21:9 Ultrawide Support:** Added support for ultrawide displays.
+- **PS4 Pro Resolution Handling:** Improved resolution handling for supported configurations.
+
+### 🎨 Graphics Customization
+
+Choose from three built-in graphics presets:
+
+- **Low**
+- **Medium**
+- **High**
+- **Custom:** Adjust individual graphics settings according to your preferences.
+
+Available graphics options:
+
+- **Crowd Density:** Low / Off, Medium (Less Details), and High (Full Details).
+- **Shadow Quality:** Low / Off, Medium, and High.
+- **Texture Quality:** Low, Medium, and High.
+- **Motion Blur:** Enable or disable motion blur.
+
+These settings provide more control over visual quality and performance, allowing users to reduce demanding effects based on their hardware.
+
+### 🎮 Controller Customization
+
+A complete controller remapping system with separate configurations for Player 1 and Player 2.
+
+- **Full Button Remapping:** Customize controller buttons to match your preferred layout.
+- **Independent Player Configurations:** Each player has their own separate button mappings.
+- **In-Game Remapping:** Switch between custom and default mappings while playing, without navigating through the game menus.
+- **Startup Configuration:** Automatically enable custom controller mappings when launching the game.
+- **Button Icon Styles:** Choose between PlayStation and Xbox button icons displayed in-game.
+- **Reset to Defaults:** Restore the original controller mappings.
+
+**Local Two-Player Support**
+
+Both controllers must be connected and turned on before launching the game. A second controller connected after the game has started will not be detected by the game engine.
+
+### ⌨️ Keyboard Customization
+
+A dedicated keyboard remapping system with customizable controls.
+
+- **Custom Key Bindings:** Customize keys for different combat actions.
+- **In-Game Remapping:** Switch between custom and default keyboard mappings while playing.
+- **Automatic Key Swapping:** Prevent conflicts between strike and modifier keys.
+- **Reset to Defaults:** Restore the original keyboard configuration.
+
+### ⚡ Performance & Graphics Improvements
+
 - **Performance Optimizations:** Improved overall performance and smoother gameplay.
 - **Frame Pacing Improvements:** Reduced stuttering and improved frame pacing during fights.
 - **Smoother Animations:** Improved the smoothness of strikes, hit animations, and visual effects.
 - **Memory Optimization:** Improved memory usage across different GPU and VRAM configurations.
-- **Multiple Resolutions:** Support for 540p, 720p, 2K, and 4K resolutions.
-- **PS4 Pro Resolution Handling:** Improved 2K and 4K support with automatic resolution handling in PS4 Pro mode.
-- **Low-End Hardware Support:** Added 540p internal resolution and further memory optimizations for lower-end systems.
+- **Low-End Hardware Support:** Includes lower internal resolution options and memory optimizations for less powerful systems.
 
-### Audio Improvements
+### 🔊 Audio Improvements
+
 - **Dialogue Boost:** Increased the center dialogue channel by +3 dB for clearer commentary, referee announcements, and fighter dialogue.
 - **Adaptive Soft Limiter:** Helps reduce intense audio peaks and prevent digital distortion and clipping.
 - **Audio Volume Control:** Adjust the audio volume directly from the launcher, with levels ranging from 75% to 200%.
 
-### Stability & Fixes
+### 🛠️ Stability & Fixes
+
 - Fixed the Career Mode sparring issue.
 - Fixed a crash that could occur when launching the game for the first time.
 - Fixed crashes affecting some systems when selecting a fighter.
@@ -45,40 +97,44 @@ This is an unofficial community project. It is not affiliated with, endorsed by,
 - Fixed various bugs and issues reported by the community.
 - Improved overall runtime stability.
 
-### Dedicated Launcher
-- A dedicated launcher for configuring supported port settings.
+### 🚀 Dedicated Launcher
+
+- A dedicated launcher for configuring and starting the port.
+- Resolution and graphics presets.
+- Custom graphics settings.
+- Controller and keyboard remapping.
+- Separate controller configurations for Player 1 and Player 2.
+- PlayStation and Xbox button icon selection.
 - Audio volume control.
-- Resolution and graphics configuration options.
 - Convenient setup and launch workflow.
 
-## Release
+## 📦 Release
 
 See the [Releases](https://github.com/abdullah-tech7/UFC4-Native-Plus/releases) page for downloads and complete release notes.
 
+## 📸 Screenshots
 
-## Screenshots
-
-### Launcher
+### 🎛️ Launcher
 
 ![UFC4 Native Plus Launcher](docs/images/u6.png)
 
-### Fighter Selection
+### 🥊 Fighter Selection
 
 ![Fighter selection](docs/images/u2.png)
 
-### Fighter Roster
+### 👥 Fighter Roster
 
 ![Fighter roster](docs/images/u3.png)
 
-### Fighter Comparison
+### ⚖️ Fighter Comparison
 
 ![Fighter comparison](docs/images/u4.png)
 
-### Gameplay
+### 🎮 Gameplay
 
 ![Gameplay](docs/images/u5.png)
 
-## Supported Game Editions
+## 🎯 Supported Game Editions
 
 This project supports the following EA SPORTS UFC 4 Title IDs and game update version:
 
@@ -89,16 +145,16 @@ This project supports the following EA SPORTS UFC 4 Title IDs and game update ve
 
 **Important:** Both editions require game update `v28.00`. Other update versions are not supported target configurations and may not work correctly.
 
-## Requirements
+## 💻 Requirements
 
 - A legally obtained copy of EA SPORTS UFC 4 that you have extracted yourself.
-- The relevant game executable/entry file requested by the launcher or port.
+- The relevant game executable/entry file requested by the launcher or port (`eboot.bin`).
 - A compatible Windows system.
 - Hardware capable of running the selected resolution and graphics settings.
 
 The game is not included. Users must supply their own game files.
 
-## Game Files & Optional DLC Patch
+## 📁 Game Files & Optional DLC Patch
 
 This repository does **not** include or distribute the game, game updates, DLC files, PlayStation firmware, save files, or other copyrighted game assets.
 
@@ -112,20 +168,29 @@ This technical description does not grant rights to DLC or other game content. U
 
 Do not upload game dumps, extracted game content, DLC files, saves, or compiled game images to issues, pull requests, or releases.
 
-## Installation & Usage
+## 📥 Installation & Usage
 
 1. Download the latest release archive from the [Releases](https://github.com/abdullah-tech7/UFC4-Native-Plus/releases) page.
 2. Extract the archive to a folder of your choice.
 3. Launch the included launcher.
 4. Select the location of your own extracted UFC 4 game files when prompted.
-5. Configure the available options.
+5. Configure your resolution, graphics, audio, controller, and keyboard settings.
 6. Start the port and enjoy UFC 4 on Windows.
 
 Exact steps and available settings may change between releases. Follow any release-specific instructions included with the download.
 
-### Updating from an Older Version
+### 🔄 Updating from an Older Version
 
-If you are updating from a previous version, transfer your save data to preserve your progress:
+**Important:** Do not overwrite your previous version with the new one. Major updates may include changes that can cause errors if you replace files directly.
+
+Follow these steps when updating:
+
+1. Back up your save file from the previous version.
+2. Delete the entire old version folder.
+3. Extract the new release into a fresh folder.
+4. Move your backed-up save data into the new installation.
+
+To preserve your progress:
 
 1. Open the `User` folder in your previous installation.
 2. Locate the `SAVEDATA` folder.
@@ -136,25 +201,26 @@ Your save data should be located at:
 
 `User/SAVEDATA`
 
-**Important:** Back up your save data before updating. Failing to transfer the folder may result in losing your existing progress.
+**Important:** Always back up your save data before updating. Failing to transfer the folder may result in losing your existing progress.
 
-## Stability & Compatibility
+## ✅ Stability & Compatibility
 
 UFC4 Native Plus reached its first stable release with v1.0.0 and is listed as **Playable** on Recompendium.
 
-Subsequent releases continue to address reported issues and improve performance and compatibility.
+Subsequent releases continue to address reported issues and improve performance, graphics, and compatibility.
 
-Stability and performance may vary depending on hardware, GPU drivers, game files, resolution, and configuration. While extensive testing and community feedback have helped improve the project, individual system configurations may produce different results.
+Stability and performance may vary depending on hardware, GPU drivers, game files, resolution, and configuration. Community feedback and testing have helped identify and resolve issues, but individual system configurations may produce different results.
 
 For the latest compatibility information and known issues, refer to the release notes and community support channels.
 
-## Credits & Upstream
+## 🙏 Credits & Upstream
 
 This project is a fork of **[schans-arg/UFC4-PC-Port](https://github.com/schans-arg/UFC4-PC-Port)**. Credit goes to the original project author and contributors for their original work and the foundation this fork builds upon.
 
 The upstream project itself incorporates components from **UFC3Native v0.1.5**. Those upstream components and their authors must continue to receive the notices and attribution required by their applicable licenses.
 
 Changes specific to this fork include:
+
 - US and EU game edition support.
 - Performance and stability improvements.
 - Optional DLC-related runtime patch.
@@ -162,12 +228,14 @@ Changes specific to this fork include:
 - Career Mode DLC fighter support.
 - Two-controller support.
 - Audio improvements and dialogue boost.
-- Additional resolution options and memory optimizations.
-- Further fixes and improvements across releases.
+- Additional internal resolutions and ultrawide support.
+- Graphics customization and presets.
+- Controller and keyboard remapping.
+- Further fixes and improvements.
 
 Please consult the commit history to distinguish upstream work from changes made in this fork.
 
-## License & Third-Party Notices
+## 📄 License & Third-Party Notices
 
 This fork retains the upstream license and applicable copyright notices for inherited code.
 
@@ -185,7 +253,7 @@ Unless a file or component states otherwise, changes to GPL-licensed portions ar
 
 This source-code license does not grant rights to EA SPORTS UFC 4, its DLC, trademarks, or any other game assets.
 
-## Disclaimer
+## ⚠️ Disclaimer
 
 EA SPORTS, UFC, PlayStation, and related names and marks belong to their respective owners.
 
