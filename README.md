@@ -9,7 +9,6 @@
 
 A community-maintained fork of [UFC4-PC-Port](https://github.com/schans-arg/UFC4-PC-Port), bringing EA SPORTS UFC 4 to Windows with support for both US and EU game editions, performance and stability improvements, an optional DLC-related runtime patch, and a dedicated launcher.
 
-**Project Status: Stable / Playable**
 
 UFC4 Native Plus reached its first stable release with v1.0.0. Subsequent updates continue to improve compatibility, performance, graphics, and gameplay customization.
 
@@ -26,7 +25,6 @@ This is an unofficial community project. It is not affiliated with, endorsed by,
 
 ### 🖥️ Display & Resolution
 
-- **Fixed Internal Resolution Scaling:** Resolution options now apply their actual rendering dimensions inside the game.
 - **Multiple Internal Resolutions:** Choose between 480p, 540p, 720p, 900p, 1080p, 1440p, and True 4K.
 - **True 4K Support:** Render the game at native 4K internal resolution.
 - **21:9 Ultrawide Support:** Added support for ultrawide displays.
@@ -87,15 +85,6 @@ A dedicated keyboard remapping system with customizable controls.
 - **Dialogue Boost:** Increased the center dialogue channel by +3 dB for clearer commentary, referee announcements, and fighter dialogue.
 - **Adaptive Soft Limiter:** Helps reduce intense audio peaks and prevent digital distortion and clipping.
 - **Audio Volume Control:** Adjust the audio volume directly from the launcher, with levels ranging from 75% to 200%.
-
-### 🛠️ Stability & Fixes
-
-- Fixed the Career Mode sparring issue.
-- Fixed a crash that could occur when launching the game for the first time.
-- Fixed crashes affecting some systems when selecting a fighter.
-- Fixed freezing issues affecting some systems.
-- Fixed various bugs and issues reported by the community.
-- Improved overall runtime stability.
 
 ### 🚀 Dedicated Launcher
 
@@ -179,39 +168,6 @@ Do not upload game dumps, extracted game content, DLC files, saves, or compiled 
 
 Exact steps and available settings may change between releases. Follow any release-specific instructions included with the download.
 
-### 🔄 Updating from an Older Version
-
-**Important:** Do not overwrite your previous version with the new one. Major updates may include changes that can cause errors if you replace files directly.
-
-Follow these steps when updating:
-
-1. Back up your save file from the previous version.
-2. Delete the entire old version folder.
-3. Extract the new release into a fresh folder.
-4. Move your backed-up save data into the new installation.
-
-To preserve your progress:
-
-1. Open the `User` folder in your previous installation.
-2. Locate the `SAVEDATA` folder.
-3. Copy the entire `SAVEDATA` folder.
-4. Paste it into the `User` folder of the new installation, maintaining the same folder structure.
-
-Your save data should be located at:
-
-`User/SAVEDATA`
-
-**Important:** Always back up your save data before updating. Failing to transfer the folder may result in losing your existing progress.
-
-## ✅ Stability & Compatibility
-
-UFC4 Native Plus reached its first stable release with v1.0.0 and is listed as **Playable** on Recompendium.
-
-Subsequent releases continue to address reported issues and improve performance, graphics, and compatibility.
-
-Stability and performance may vary depending on hardware, GPU drivers, game files, resolution, and configuration. Community feedback and testing have helped identify and resolve issues, but individual system configurations may produce different results.
-
-For the latest compatibility information and known issues, refer to the release notes and community support channels.
 
 ## 🙏 Credits & Upstream
 
