@@ -112,21 +112,20 @@ See the [Releases](https://github.com/abdullah-tech7/UFC4-Native-Plus/releases) 
 ![UFC4 Native Plus Launcher](docs/images/n2.png)
 ![UFC4 Native Plus Launcher](docs/images/n3.png)
 ![UFC4 Native Plus Launcher](docs/images/n4.png)
-### 🥊 Fighter Selection
+
+### 🥊 In Game
 
 ![Fighter selection](docs/images/u2.png)
 
-### 👥 Fighter Roster
+
 
 ![Fighter roster](docs/images/u3.png)
 
-### ⚖️ Fighter Comparison
-
 ![Fighter comparison](docs/images/u4.png)
 
-### 🎮 Gameplay
-
 ![Gameplay](docs/images/u5.png)
+
+![Gameplay](docs/images/n5.png)
 
 ## 🎯 Supported Game Editions
 
