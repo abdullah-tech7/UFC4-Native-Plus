@@ -125,7 +125,7 @@ See the [Releases](https://github.com/abdullah-tech7/UFC4-Native-Plus/releases) 
 
 ![Gameplay](docs/images/u5.png)
 
-![Gameplay](docs/images/n5.png)
+![Gameplay](docs/images/n5.jpg)
 
 ## 🎯 Supported Game Editions
 
