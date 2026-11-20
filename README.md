@@ -23,6 +23,9 @@ This is an unofficial community project. It is not affiliated with, endorsed by,
 - **DLC Fighters in Career Mode:** Use DLC fighters in Career Mode without requiring separate DLC files.
 - **Two-Controller Support:** Play locally with two controllers, with separate configurations for each player.
 
+### 🛒 Unlock Vanity Clothing & Store Items
+- Added an optional feature to unlock all in-game vanity clothing and store items, including outfits, hats, tattoos, and accessories, without requiring an active connection to EA Online Store services. Items can be used when creating or customizing fighters, both inside and outside Career Mode.
+
 ### 🖥️ Display & Resolution
 
 - **Multiple Internal Resolutions:** Choose between 480p, 540p, 720p, 900p, 1080p, 1440p, and True 4K.
