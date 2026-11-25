@@ -268,6 +268,9 @@ const Chunk* Find(std::uint64_t phys) {
     const Chunk* c = chunks[lo - 1];
     return phys < c->phys + c->size ? c : nullptr;
 }
+std::uint64_t TotalBytes() {
+    return chunk_bytes.load(std::memory_order_relaxed);
+}
 } // namespace BbGuestMemory
 #else
 // Windows: no dma-buf export; guest memory stays in the runtime's section and the GPU side
@@ -287,5 +290,6 @@ bool Usable(const Vulkan::Instance&) {
 bool PcModelGpu(const Vulkan::Instance&) { return false; }
 void Install(const Vulkan::Instance&) {}
 const Chunk* Find(std::uint64_t) { return nullptr; }
+std::uint64_t TotalBytes() { return 0; }
 } // namespace BbGuestMemory
 #endif

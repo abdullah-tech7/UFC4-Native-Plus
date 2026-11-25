@@ -239,10 +239,18 @@ uintptr_t runtime_resolve(const char *name, int is_data) {
     if (rwlock) return rwlock;
     uintptr_t memory = runtime_memory_resolve(name);
     if (memory) return memory;
+    extern uintptr_t ufc4_kernel_resolve(const char *name);
+    extern uintptr_t ufc4_services_resolve(const char *name);
+    extern uintptr_t ufc4_savedata_resolve(const char *name);
+    extern uintptr_t ufc4_bbgpu_fallback(const char *name);
+    uintptr_t u4k = ufc4_kernel_resolve(name);
+    if (u4k) return u4k;
     uintptr_t kernel = runtime_kernel_resolve(name);
     if (kernel) return kernel;
     uintptr_t net = runtime_net_resolve(name);
     if (net) return net;
+    uintptr_t u4svc = ufc4_services_resolve(name);
+    if (u4svc) return u4svc;
     uintptr_t services = runtime_services_resolve(name);
     if (services) return services;
     uintptr_t ajm = runtime_ajm_resolve(name);
@@ -253,11 +261,14 @@ uintptr_t runtime_resolve(const char *name, int is_data) {
     if (pad) return pad;
     uintptr_t rtc = runtime_rtc_resolve(name);
     if (rtc) return rtc;
+    uintptr_t u4save = ufc4_savedata_resolve(name);
+    if (u4save) return u4save;
     uintptr_t save = runtime_savedata_resolve(name);
     if (save) return save;
     uintptr_t file = runtime_file_resolve(name);
     if (file) return file;
-    return bbgpu_resolve(name);
+    uintptr_t gpu = bbgpu_resolve(name);
+    return gpu ? gpu : ufc4_bbgpu_fallback(name);
 }
 static const struct { const char *nid, *symbol; } import_names[]={
 #include "import_names.inc"

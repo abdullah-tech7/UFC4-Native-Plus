@@ -1551,6 +1551,27 @@ void BufferCache::EnsureResident(const Buffer* arena, u64 first_block, u64 last_
 
     // bbport BB_GUEST_IN_PLACE: blocks of the game's direct memory are bound to the memory it
     // lives in; the rest (and everything without it) gets VRAM as before.
+    if (GuestInPlace() && !GarlicInVram()) {
+        const u64 PrebindBlocks = 32_MB >> block_shift;
+        const u64 arena_first = arena->cpu_addr >> block_shift;
+        const u64 arena_end = (arena->cpu_addr + arena->SizeBytes()) >> block_shift;
+        const u64 win_start = std::max(arena_first, first_block & ~(PrebindBlocks - 1));
+        const u64 win_end = std::min(arena_end, (last_block + PrebindBlocks) & ~(PrebindBlocks - 1));
+        u64 probe_phys = 0;
+        uintptr_t probe_end = 0;
+        if (runtime_memory_direct_phys(win_start << block_shift, &probe_phys, &probe_end) &&
+            (probe_phys & (block_size - 1)) == 0 && BbGuestMemory::Find(probe_phys) != nullptr) {
+            const auto* probe_chunk = BbGuestMemory::Find(probe_phys);
+            const u64 max_bytes = std::min<u64>(probe_end - (win_start << block_shift),
+                                                probe_chunk->phys + probe_chunk->size - probe_phys);
+            const u64 safe_end = std::min(win_end, win_start + (max_bytes >> block_shift));
+            if (safe_end > last_block + 1) {
+                bind_ranges.Clear();
+                resident_ranges.ForEachGap(win_start, safe_end,
+                                           [&](u64 start, u64 end) { bind_ranges.Add({start, end}); });
+            }
+        }
+    }
     std::vector<ResidentBind> binds;
     if (GuestInPlace()) {
         IntervalList rest;

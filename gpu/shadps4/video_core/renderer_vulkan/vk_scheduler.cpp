@@ -734,17 +734,23 @@ void Scheduler::RecorderThread(std::stop_token stoken, u32 index) {
         // a wake-up syscall per kick. With few hardware threads (Steam Deck: 8) the spin would
         // take time from guest threads. The others sleep until a new segment reaches them.
         if (active_worker.load(std::memory_order_relaxed) == index) {
-            static const auto spin_time =
-                std::chrono::microseconds(BbThreads::Available() >= 12 ? 200 : 20);
-            const auto spin_until = std::chrono::steady_clock::now() + spin_time;
-            for (u32 spins = 1; worker.queued.load(std::memory_order_acquire) == 0 &&
-                                ordered_queued.load(std::memory_order_acquire) == 0;
-                 ++spins) {
-                __builtin_ia32_pause();
-                // The clock is read every 256 pauses, not per iteration.
-                if (!(spins & 255) &&
-                    (stoken.stop_requested() || std::chrono::steady_clock::now() >= spin_until)) {
-                    break;
+            static const auto spin_time = std::chrono::microseconds([] {
+                if (const char* env = std::getenv("BB_RECORDER_SPIN_US")) {
+                    return std::max(0, std::atoi(env));
+                }
+                return BbThreads::Available() >= 12 ? 200 : 0;
+            }());
+            if (spin_time.count() > 0) {
+                const auto spin_until = std::chrono::steady_clock::now() + spin_time;
+                for (u32 spins = 1; worker.queued.load(std::memory_order_acquire) == 0 &&
+                                    ordered_queued.load(std::memory_order_acquire) == 0;
+                     ++spins) {
+                    __builtin_ia32_pause();
+                    // The clock is read every 256 pauses, not per iteration.
+                    if (!(spins & 255) &&
+                        (stoken.stop_requested() || std::chrono::steady_clock::now() >= spin_until)) {
+                        break;
+                    }
                 }
             }
         }

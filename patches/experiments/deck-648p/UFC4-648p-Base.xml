@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Patch>
+    <TitleID>
+        <ID>CUSA14209</ID>
+    </TitleID>
+    <Metadata Title="EA SPORTS UFC 4"
+              Name="UFC 4 Steam Deck 648p Scene + 720p UI (1152x648)"
+              Note="Renders base PS4 3D scene at 1152x648 (90% of 720p) with 1280x720 UI for locked 60 FPS on Steam Deck."
+              Author="steamdeck-opt"
+              PatchVer="0.1"
+              AppVer="28.00"
+              AppElf="eboot.bin"
+              isEnabled="false">
+        <PatchList>
+            <Line Type="bytes32" Address="0x0091ae36" Value="0x00000288"
+                  Signature="eb 15 b8 84 03 00 00 be 40 06 00 00 89 31 89 c3 89 f2 89 c1 41 89 f0" SignatureOffset="0x03"/>
+            <Line Type="bytes32" Address="0x0091ae3b" Value="0x00000480"
+                  Signature="eb 15 b8 84 03 00 00 be 40 06 00 00 89 31 89 c3 89 f2 89 c1 41 89 f0" SignatureOffset="0x08"/>
+            <Line Type="bytes32" Address="0x0091ae59" Value="0x00000500"
+                  Signature="49 ba 80 07 00 00 38 04 00 00 41 89 46 3c" SignatureOffset="0x02"/>
+            <Line Type="bytes32" Address="0x0091ae5d" Value="0x000002d0"
+                  Signature="49 ba 80 07 00 00 38 04 00 00 41 89 46 3c" SignatureOffset="0x06"/>
+            <Line Type="bytes32" Address="0x0091ae97" Value="0x00000500"
+                  Signature="49 ba 23 00 00 00 80 07 00 00 66 41 c7 46 64 01 01" SignatureOffset="0x06"/>
+            <Line Type="bytes32" Address="0x0091aebb" Value="0x000002d0"
+                  Signature="41 c7 47 58 23 00 00 00 41 c7 47 7c 38 04 00 00" SignatureOffset="0x0c"/>
+        </PatchList>
+    </Metadata>
+</Patch>

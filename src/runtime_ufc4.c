@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
+#define _GNU_SOURCE
 /* UFC 4 additions, linked normally in a full build or into the measured donor's
  * identified call sites by tools/link_runtime_extension.py. No generic success stubs.
  * PftFlag mirrors shadPS4 app_content.cpp's explicitly logged compatibility stub.
@@ -28,14 +29,7 @@ uintptr_t ufc4_kernel_lookup(const void *table,size_t count,const char *name) {
 }
 #include "ufc4_savedata.c"
 #include "ufc4_dialog.c"
-#ifdef _WIN32
 #include "ufc4_net.c"
-#else
-extern uintptr_t runtime_services_resolve(const char *name);
-uintptr_t ufc4_services_resolve(const char *name) {
-    uintptr_t dialog=u4_dialog_resolve(name);return dialog ? dialog : runtime_services_resolve(name);
-}
-#endif
 extern uintptr_t bbgpu_resolve(const char *name);
 extern uint64_t platform_monotonic_ns(void);
 extern int platform_sleep_ns(uint64_t ns);

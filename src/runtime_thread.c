@@ -38,6 +38,7 @@ typedef struct GuestThread {
     ThreadAttr attr;
     char name[32];
     int detached, finished, joined, host_owned;
+    _Atomic int attached;
     jmp_buf exit_jump;
     struct GuestThread *next;
 } GuestThread;
@@ -68,10 +69,11 @@ static void attach(GuestThread *t) {
     tcb[0]=(uint64_t)(uintptr_t)tcb;         /* tcb_self */
     tcb[1]=(uint64_t)(uintptr_t)dtv;         /* tcb_dtv (static module only) */
     tcb[2]=(uint64_t)(uintptr_t)t;           /* tcb_thread */
-    t->tls_block=block; t->tcb=tcb;
+    t->tls_block=block; t->tcb=(uint64_t *)(uintptr_t)platform_thread_id();
     platform_thread_publish_tcb(tcb);
     current=t;
     runtime_fp_thread_setup(); /* BB_DETERMINISTIC_FP: Orbis' MXCSR and x87 control word */
+    atomic_store_explicit(&t->attached, 1, memory_order_release);
 }
 static GuestThread *new_thread(void) {
     GuestThread *t=calloc(1,sizeof(*t));
@@ -240,6 +242,8 @@ static int32_t create(GuestThread **out,ThreadAttr **attr_slot,GuestEntry entry,
     int e=pthread_create(&t->host,&host,host_start,t);
     pthread_attr_destroy(&host);
     if (e) { fprintf(stderr,"STOP: host pthread_create failed: %d\n",e); exit(21); }
+    /* UFC4 EAThread reads the first ScePthread word immediately after create() as ThreadId. */
+    while (!atomic_load_explicit(&t->attached, memory_order_acquire)) { platform_sleep_ns(1000); }
     if (t->detached) pthread_detach(t->host);
     pthread_mutex_lock(&lock); ++created; pthread_mutex_unlock(&lock);
     printf("Runtime: guest thread '%s' created (stack=%llu, prio=%d)\n",t->name,(unsigned long long)stack,t->attr.prio);

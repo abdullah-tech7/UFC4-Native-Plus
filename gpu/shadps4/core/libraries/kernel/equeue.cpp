@@ -357,25 +357,22 @@ int EqueueInternal::WaitForSmallTimer(OrbisKernelEvent* ev, int num, u32 micros)
             }
             if (count > 0)
                 return count;
-            if (m_small_timers.empty()) {
-                // Every small timer was deleted while waiting: a regular wait, woken by
-                // TriggerEvent or by AddSmallTimer (which notifies m_cond).
-                const auto predicate = [&] {
-                    count = GetTriggeredEvents(ev, num);
-                    return count > 0 || !m_small_timers.empty();
-                };
-                if (micros == 0) {
-                    m_cond.wait(lock, predicate);
-                } else if (!m_cond.wait_until(lock, wait_end_us, predicate)) {
-                    return 0;
+            auto earliest = wait_end_us;
+            for (const auto& [id, st] : m_small_timers) {
+                const auto deadline = st.added + st.interval;
+                if (deadline < earliest) {
+                    earliest = deadline;
                 }
-                if (count > 0)
-                    return count;
-                continue; // a new small timer: keep spinning on it
+            }
+            if (earliest > curr_clock) {
+                if (earliest == std::chrono::steady_clock::time_point::max()) {
+                    m_cond.wait(lock);
+                } else {
+                    m_cond.wait_until(lock, earliest);
+                }
             }
         }
-        std::this_thread::yield();
-    } while (curr_clock < wait_end_us);
+    } while (std::chrono::steady_clock::now() < wait_end_us);
 
     return 0;
 }
