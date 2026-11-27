@@ -163,6 +163,8 @@ Do not upload game dumps, extracted game content, DLC files, saves, or compiled 
 
 ## 📥 Installation & Usage
 
+### 🪟 Windows
+
 1. Download the latest release archive from the [Releases](https://github.com/abdullah-tech7/UFC4-Native-Plus/releases) page.
 2. Extract the archive to a folder of your choice.
 3. Launch the included launcher.
@@ -171,6 +173,72 @@ Do not upload game dumps, extracted game content, DLC files, saves, or compiled 
 6. Start the port and enjoy UFC 4 on Windows.
 
 Exact steps and available settings may change between releases. Follow any release-specific instructions included with the download.
+
+### 🐧 Linux & Steam Deck (Native 60 FPS Branch)
+
+This branch (`steamdeck-linux-60fps`) adds native Linux support and Steam Deck OLED/LCD optimizations targeting **60 FPS at native `1280×720` without lowering graphics settings**:
+
+- **GPU & Shader Optimizations:** Drops `NoContraction` on Fragment/Compute SPIR-V shaders (preserving Vertex/Geometry Z-invariance) for RDNA 2 FMA fusion & ACO optimizations, tightens `BindTextures` Vulkan barrier stage masks, and pre-binds 32 MiB contiguous dma-buf chunks on integrated GPUs.
+- **CPU & TDP Efficiency:** Replaces `clock_gettime(CLOCK_MONOTONIC)` hot paths with calibrated invariant `__rdtsc()` + spin-wait `PAUSE` backoff for EA job threads, shrinks `PendingReads` tables to fit in Zen 2 L2 cache, and supports `BB_MARCH=znver2` + LTO + PGO.
+- **Steam Deck Controls:** Native Steam Input vibration (`FF_RUMBLE`) forwarding via evdev.
+
+#### 1. Prepare Game Files
+
+Extract your legally obtained PS4 copy of **EA SPORTS UFC 4** (`CUSA14209` EU or `CUSA14204` US) and merge it with update **`v28.00`** into a single folder containing `eboot.bin` (e.g. `CUSA14209-merged`).
+
+#### 2. Build from Source (SteamOS / Arch / Linux)
+
+On **SteamOS (Steam Deck)**, build inside an Arch Linux Distrobox container:
+
+```bash
+distrobox create -n ufc4-dev -i docker.io/library/archlinux:latest
+distrobox enter ufc4-dev
+sudo pacman -Syu --needed base-devel git cmake ninja pkgconf vulkan-headers vulkan-icd-loader sdl3 zydis boost fmt
+```
+
+Clone this branch and build with Zen 2 tuning:
+
+```bash
+git clone -b steamdeck-linux-60fps https://github.com/DiM3NT0R/UFC4-Native-SteamDeck.git UFC4-port
+cd UFC4-port
+BB_MARCH=znver2 BB_LTO=ON bash build.sh
+```
+
+*(Optional — maximum performance via PGO)*:
+```bash
+# 1. Build instrumented binary
+BB_PGO=generate BB_MARCH=znver2 BB_LTO=ON bash build.sh
+# 2. Play one fight in UFC 4 to populate pgo/*.gcda, then exit cleanly
+# 3. Rebuild using the collected profile
+BB_PGO=use BB_MARCH=znver2 BB_LTO=ON bash build.sh
+```
+
+#### 3. Launch on Steam Deck (Native 720p @ 60 FPS)
+
+Run directly with native `1280×720` (no downscaling or FSR1/RCAS) and optimal pacing flags:
+
+```bash
+BB_PREBUILT=1 \
+BB_GAME_DIR="/path/to/CUSA14209-merged" \
+BB_PATCHES_DIR="$PWD/patches/experiments/deck-720p" \
+BB_PATCHES_CONFIG="$PWD/patches/experiments/deck-720p/patches-720p.json" \
+BB_PC_MODEL=1 \
+BB_BREADCRUMBS=0 \
+BB_PIPE_SPIN_US=0 \
+BB_FSR1=0 \
+BB_RCAS=0 \
+BB_VBLANK_HZ=480 \
+BB_FPS_LIMIT=60 \
+BB_PRESENT_MODE=Immediate \
+BB_LANGUAGE=1 \
+DISABLE_LSFGVK=1 \
+./run.sh
+```
+
+- **Language:** Set `BB_LANGUAGE=1` for English, `BB_LANGUAGE=8` for Russian.
+- **Resolution Presets:** Use `patches/experiments/deck-720p` (native `1280×720`, recommended), `deck-648p`, or `deck-576p`.
+- **Adding to Steam (Game Mode):** Add your launcher script (e.g. `ufc4.sh`) as a Non-Steam Game in Desktop Mode (no Proton compatibility layer needed — it runs natively on Linux).
+- **Steam Deck Performance Tip:** In the Quick Access Menu (`•••` → Performance), setting **Manual GPU Clock = 1600 MHz** gives extra GPU headroom in heavy octagon scenes under the 15W TDP cap without lowering visual quality.
 
 
 ## 🙏 Credits & Upstream
