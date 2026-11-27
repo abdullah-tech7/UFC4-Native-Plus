@@ -9,6 +9,7 @@
 #include <xxhash.h>
 
 #include "bbport_toggles.h"
+#include "bbport_guest_memory.h"
 #include "bbport_free_check.h"
 #include "bbport_clobber.h"
 #include "common/assert.h"
@@ -1685,6 +1686,10 @@ void TextureCache::UntrackImageTail(ImageId image_id) {
 void TextureCache::GarbageCollectImages() {
     if (instance.CanReportMemoryUsage()) {
         total_used_memory = instance.GetDeviceMemoryUsage();
+        if (instance.IsIntegrated()) {
+            const u64 guest_dmabuf = BbGuestMemory::TotalBytes();
+            total_used_memory = total_used_memory > guest_dmabuf ? (total_used_memory - guest_dmabuf) : 0;
+        }
         // bbport: on integrated GPUs (Steam Deck) the usage covers system-memory heaps holding
         // much more than images (buffers backing guest memory), and the startup budget left
         // ~1 GB after its 8 GB system reserve: usage stayed above the critical mark, so the

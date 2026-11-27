@@ -25,6 +25,10 @@ option(BB_AVPLAYER "Build the AvPlayer/Videodec libraries (needs FFmpeg)" OFF)
 # profile). Covers bbgpu and the static libraries linked into it. No -march: the same build
 # runs on the Steam Deck.
 option(BB_LTO "Link-time optimization of bbgpu" ON)
+set(BB_MARCH "" CACHE STRING "Optional target CPU architecture (e.g. znver2 for Steam Deck)")
+if (BB_MARCH)
+    add_compile_options(-O3 "-march=${BB_MARCH}")
+endif()
 set(BB_PGO "off" CACHE STRING "Profile-guided optimization: off, generate, use")
 set(BB_PGO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../pgo" CACHE PATH "Profile directory")
 if (BB_LTO)

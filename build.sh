@@ -54,7 +54,7 @@ if ! fsr_patches_apply --check 2>/dev/null; then
 fi
 fsr_patches_apply
 cmake -S gpu -B out/gpu -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBB_PGO="$pgo" \
-    -DBB_LTO="${BB_LTO:-ON}" -DBB_PGO_DIR="$PWD/pgo" >/dev/null
+    -DBB_LTO="${BB_LTO:-ON}" -DBB_MARCH="${BB_MARCH:-}" -DBB_PGO_DIR="$PWD/pgo" >/dev/null
 echo "GPU library: PGO $pgo, LTO ${BB_LTO:-ON}"
 # A failed GPU build must stop here: an older libbbgpu.so would otherwise be used silently.
 if ! ninja -C out/gpu bbgpu > out/gpu-build.log 2>&1; then
@@ -72,7 +72,9 @@ if [[ ! -f out/libatrac9.a || -n $(find third_party/LibAtrac9/C/src -newer out/l
     for source in "${atrac9[@]}"; do "$CC" -std=c99 -O2 -g -w -c "$source" -o "out/atrac9/$(basename "${source%.c}").o"; done
     ar rcs out/libatrac9.a out/atrac9/*.o
 fi
-"$CC" -std=c11 -O2 -g -Wall -Wextra -Werror -pthread -no-pie "${includes[@]}" -I. -Isrc src/probe.c "${runtime[@]}" src/vulkan_smoke.c out/libatrac9.a -lm -lZydis "${gpu[@]}" "${libraries[@]}" -o out/sacredfire
+march_flags=()
+if [[ -n ${BB_MARCH:-} ]]; then march_flags=(-O3 "-march=${BB_MARCH}"); else march_flags=(-O2); fi
+"$CC" -std=c11 "${march_flags[@]}" -g -Wall -Wextra -Werror -pthread -no-pie "${includes[@]}" -I. -Isrc src/probe.c "${runtime[@]}" src/vulkan_smoke.c out/libatrac9.a -lm -lZydis "${gpu[@]}" "${libraries[@]}" -o out/sacredfire
 echo "Built $PWD/out/sacredfire"
 # out/VERSION: the source revision this build came from (the nearest v* tag, else the commit;
 # "-dirty" when tracked files differ from it). run.sh prints it, the launcher shows it and the

@@ -4,11 +4,27 @@
  * No outbound connection or packet is sent: NetCtl remains disconnected.
  * Unsupported operations return an explicit network error.
  */
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
 #include <limits.h>
+typedef int u4_socklen_t;
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <limits.h>
+typedef int SOCKET;
+typedef socklen_t u4_socklen_t;
+#define INVALID_SOCKET (-1)
+#define SOCKET_ERROR (-1)
+#endif
 
 extern int32_t *runtime_errno(void);
 extern uintptr_t runtime_services_resolve(const char *);
@@ -18,6 +34,11 @@ typedef struct { uint8_t length,family; uint16_t port; uint32_t address; uint8_t
 typedef struct { SOCKET host; int active,type; } U4Socket;
 static U4Socket u4_sockets[256];
 static pthread_mutex_t u4_net_lock=PTHREAD_MUTEX_INITIALIZER;
+static int32_t u4_net_error(int bsd) {
+    *runtime_errno()=bsd;
+    return (int32_t)(UINT32_C(0x80410100)|(unsigned)bsd);
+}
+#ifdef _WIN32
 static int u4_wsa_ready;
 static HMODULE u4_wsa;
 #define WSA_PROC(name) static __typeof__(&name) u4_##name
@@ -38,10 +59,6 @@ static int u4_initialize_wsa(void) {
     if (WSAStartup(MAKEWORD(2,2),&data)) return 0;
     u4_wsa_ready=1; return 1;
 }
-static int32_t u4_net_error(int bsd) {
-    *runtime_errno()=bsd;
-    return (int32_t)(UINT32_C(0x80410100)|(unsigned)bsd);
-}
 static int32_t u4_last_error(void) {
     int error=u4_WSAGetLastError(),bsd=5;
     switch(error) {
@@ -57,6 +74,39 @@ static int32_t u4_last_error(void) {
     }
     return u4_net_error(bsd);
 }
+static int u4_set_nonblocking(SOCKET s) {
+    u_long nonblocking=1;
+    return u4_ioctlsocket(s,FIONBIO,&nonblocking);
+}
+#else
+static int u4_initialize_wsa(void) { return 1; }
+#define u4_socket socket
+#define u4_bind bind
+#define u4_closesocket close
+#define u4_setsockopt setsockopt
+#define u4_getsockopt getsockopt
+#define u4_getsockname getsockname
+#define u4_recvfrom recvfrom
+static int u4_set_nonblocking(SOCKET s) {
+    int f = fcntl(s, F_GETFL, 0);
+    return f < 0 ? -1 : fcntl(s, F_SETFL, f | O_NONBLOCK);
+}
+static int32_t u4_last_error(void) {
+    int bsd = 5;
+    switch (errno) {
+    case EAGAIN: bsd=35; break; case EINPROGRESS: bsd=36; break;
+    case EBADF: case ENOTSOCK: bsd=9; break; case EINVAL: bsd=22; break;
+    case EFAULT: bsd=14; break; case EACCES: bsd=13; break;
+    case EMFILE: bsd=24; break; case EADDRINUSE: bsd=48; break;
+    case EADDRNOTAVAIL: bsd=49; break; case ENETUNREACH: bsd=51; break;
+    case ECONNRESET: bsd=54; break; case ENOBUFS: bsd=55; break;
+    case ENOTCONN: bsd=57; break; case ETIMEDOUT: bsd=60; break;
+    case ECONNREFUSED: bsd=61; break; case ENOPROTOOPT: bsd=42; break;
+    case EAFNOSUPPORT: bsd=47; break;
+    }
+    return u4_net_error(bsd);
+}
+#endif
 static U4Socket *u4_get_socket(int id) {
     int i=id-10000;
     return i>=0 && i<256 && u4_sockets[i].active ? &u4_sockets[i] : NULL;
@@ -71,8 +121,7 @@ static GUEST int32_t u4_net_socket(const char *name,int af,int type,int protocol
     else for (int i=0;i<256;i++) if (!u4_sockets[i].active) {
         SOCKET host=u4_socket(AF_INET,type,protocol);
         if (host==INVALID_SOCKET) {result=u4_last_error(); break;}
-        u_long nonblocking=1;
-        if (u4_ioctlsocket(host,FIONBIO,&nonblocking)) {result=u4_last_error();u4_closesocket(host);break;}
+        if (u4_set_nonblocking(host)) {result=u4_last_error();u4_closesocket(host);break;}
         u4_sockets[i]=(U4Socket){host,1,type}; result=10000+i;
         printf("UFC4: local offline socket %d (%s, type %d)\n",result,name?name:"",type);
         break;
@@ -100,7 +149,7 @@ static GUEST int32_t u4_net_bind(int id,const U4Address *address,uint32_t length
 static GUEST int32_t u4_net_name(int id,U4Address *address,uint32_t *length) {
     if (!address || !length || *length<16) return u4_net_error(22);
     pthread_mutex_lock(&u4_net_lock); U4Socket *s=u4_get_socket(id);
-    struct sockaddr_in host; int size=sizeof(host); int32_t result=0;
+    struct sockaddr_in host; u4_socklen_t size=sizeof(host); int32_t result=0;
     if (!s) result=u4_net_error(9);
     else if (u4_getsockname(s->host,(struct sockaddr *)&host,&size)) result=u4_last_error();
     else { memset(address,0,16);address->length=16;address->family=2;address->port=host.sin_port;address->address=host.sin_addr.s_addr;*length=16; }
@@ -137,7 +186,7 @@ static GUEST int32_t u4_net_set_option(int id,int level,int option,const void *v
 static GUEST int32_t u4_net_get_option(int id,int level,int option,void *value,uint32_t *size) {
     if (!value || !size || *size<4 || *size>INT_MAX) return u4_net_error(22);
     pthread_mutex_lock(&u4_net_lock); U4Socket *s=u4_get_socket(id); int32_t result=0;
-    int host_level,host_option,length=(int)*size;
+    int host_level,host_option; u4_socklen_t length=(u4_socklen_t)*size;
     if (!s) result=u4_net_error(9);
     else if (level==0xffff && option==0x1200) {*(int *)value=1;*size=4;}
     else if (!u4_host_option(level,option,&host_level,&host_option)) result=u4_net_error(42);
@@ -153,7 +202,7 @@ static GUEST int64_t u4_net_receive(int id,void *buffer,uint64_t size,int flags,
     (void)flags;
     if ((!buffer && size) || size>INT_MAX || (from && (!from_length || *from_length<16))) return u4_net_error(22);
     pthread_mutex_lock(&u4_net_lock); U4Socket *s=u4_get_socket(id); int64_t result;
-    struct sockaddr_in host; int length=sizeof(host);
+    struct sockaddr_in host; u4_socklen_t length=sizeof(host);
     if (!s) result=u4_net_error(9);
     else {
         result=u4_recvfrom(s->host,buffer,(int)size,0,from?(struct sockaddr *)&host:NULL,from?&length:NULL);

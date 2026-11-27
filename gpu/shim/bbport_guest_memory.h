@@ -38,4 +38,6 @@ bool PcModelGpu(const Vulkan::Instance& instance);
 void Install(const Vulkan::Instance& instance);
 /// The chunk holding direct memory address `phys`, or null.
 const Chunk* Find(std::uint64_t phys);
+/// Total bytes currently allocated as dma-buf guest direct memory chunks.
+std::uint64_t TotalBytes();
 } // namespace BbGuestMemory

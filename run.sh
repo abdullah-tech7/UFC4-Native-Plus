@@ -59,7 +59,7 @@ export BB_GAME_PROFILE=${profile:-ufc3}
 echo "Game profile: $BB_GAME_PROFILE"
 # ufc3: the fight scene renders black without precise readbacks of linear images (the same as
 # shadPS4 issue #4375 for UFC 4, same engine); both are defaults for this game.
-if [[ $BB_GAME_PROFILE == ufc3 ]]; then
+if [[ $BB_GAME_PROFILE == ufc3 || $BB_GAME_PROFILE == ufc4 ]]; then
     export BB_READBACKS=${BB_READBACKS:-2} BB_READBACK_LINEAR=${BB_READBACK_LINEAR:-1}
     # Precise readbacks deadlock against the GPU write twins (twins_mutex held by the thread a
     # readback waits for); off for this game.
@@ -114,8 +114,10 @@ aerolib_args=(); [[ -f share/aerolib.inl ]] && aerolib_args=(--aerolib share/aer
 # https://github.com/illusionyy/PS-Game-Patch), chosen in the in-game menu (bbport.ini patch_*
 # keys) or patches.json; BB_PATCHES_DIR adds a folder of further shadPS4-format XML files.
 fps=${BB_FPS:-30}
+patch_title=CUSA06534; patch_ver=01.14
+if [[ $BB_GAME_PROFILE == ufc4 ]]; then patch_title=CUSA14209; patch_ver=28.00; fi
 "$PYTHON" scripts/patches.py --patches-dir "${BB_PATCHES_DIR:-patches}" --patches-config "${BB_PATCHES_CONFIG:-$data/patches.json}" \
-    --app-version 01.14 --title-id CUSA06534 --out "$out" --settings "$BB_CONFIG"
+    --app-version "$patch_ver" --title-id "$patch_title" --out "$out" --settings "$BB_CONFIG"
 patch_args=(--patches "$out/patches.bin")
 # BB_NEO=1: PS4 Pro mode (sceKernelIsNeoMode, 7-CPU mode, 5568 MiB direct memory); the game then
 # picks its Pro rendering path. Off by default: the Steam Deck is closer to a base PS4.

@@ -47,7 +47,25 @@ static int32_t fail_posix(int e) { *runtime_errno()=runtime_guest_errno(e); retu
 
 /* ---- clocks and sleeping ---- */
 static uint64_t process_start_ns;
-__attribute__((constructor)) static void remember_start(void) { process_start_ns=platform_monotonic_ns(); }
+static uint64_t tsc_hz;
+static uint64_t tsc_start;
+static uint64_t tsc_ns_mul; /* fixed-point (1e9 << 32) / tsc_hz for invariant TSC */
+__attribute__((constructor)) static void remember_start(void) {
+    const uint64_t a = platform_monotonic_ns();
+    const uint64_t t0 = __rdtsc();
+    platform_sleep_ns(10000000); /* 10 ms calibration */
+    const uint64_t b = platform_monotonic_ns();
+    const uint64_t t1 = __rdtsc();
+    const uint64_t ns = b - a;
+    tsc_hz = (t1 - t0) * 1000000000ULL / (ns ? ns : 1);
+    tsc_ns_mul = (uint64_t)((((__uint128_t)1000000000ULL << 32) + (tsc_hz >> 1)) / (tsc_hz ? tsc_hz : 1));
+    tsc_start = t1;
+    process_start_ns = b;
+}
+static inline uint64_t fast_elapsed_ns(void) {
+    const uint64_t dt = __rdtsc() - tsc_start;
+    return (uint64_t)(((__uint128_t)dt * tsc_ns_mul) >> 32);
+}
 static int host_clock(uint32_t id,clockid_t *out) {
     switch (id) {
     case 0: case 9: case 10: *out=CLOCK_REALTIME; return 1;            /* REALTIME(_PRECISE/_FAST) */
@@ -62,6 +80,12 @@ static int host_clock(uint32_t id,clockid_t *out) {
 static int clock_read(uint32_t id,GuestTimespec *ts) {
     clockid_t host;
     if (!ts || !host_clock(id,&host)) return EINVAL;
+    if (host == CLOCK_MONOTONIC && tsc_ns_mul) {
+        const uint64_t ns = process_start_ns + fast_elapsed_ns();
+        ts->sec = (int64_t)(ns / 1000000000ULL);
+        ts->nsec = (int64_t)(ns % 1000000000ULL);
+        return 0;
+    }
     struct timespec t;
     if (clock_gettime(host,&t)) return errno;
     if (id==13) t.tv_nsec=0;
@@ -80,19 +104,27 @@ static ABI int32_t posix_clock_getres(uint32_t id,GuestTimespec *ts) {
     if (ts) { ts->sec=t.tv_sec; ts->nsec=t.tv_nsec; }
     return 0;
 }
-static ABI uint64_t process_time(void) { return (platform_monotonic_ns()-process_start_ns)/1000; }
-static ABI uint64_t process_time_counter(void) { return platform_monotonic_ns()-process_start_ns; }
+static _Thread_local uint64_t ptc_last_tsc;
+static _Thread_local uint32_t ptc_spin_streak;
+static ABI uint64_t process_time(void) { return fast_elapsed_ns()/1000; }
+static ABI uint64_t process_time_counter(void) {
+    const uint64_t now = __rdtsc();
+    if (now - ptc_last_tsc < 6000ULL) {
+        if (++ptc_spin_streak >= 8) {
+            __builtin_ia32_pause();
+            __builtin_ia32_pause();
+            __builtin_ia32_pause();
+            __builtin_ia32_pause();
+        }
+    } else {
+        ptc_spin_streak = 0;
+    }
+    ptc_last_tsc = now;
+    return (uint64_t)(((__uint128_t)(now - tsc_start) * tsc_ns_mul) >> 32);
+}
 static ABI uint64_t process_time_frequency(void) { return 1000000000; }
 static ABI uint64_t read_tsc(void) { return __rdtsc(); }
-static uint64_t tsc_hz;
 static ABI uint64_t tsc_frequency(void) {
-    if (!tsc_hz) {
-        const uint64_t a=platform_monotonic_ns(); uint64_t t0=__rdtsc();
-        platform_sleep_ns(20000000);
-        const uint64_t b=platform_monotonic_ns(); uint64_t t1=__rdtsc();
-        const uint64_t ns=b-a;
-        tsc_hz=(t1-t0)*1000000000/(ns ? ns : 1);
-    }
     return tsc_hz;
 }
 /* Shared with the GPU library so flip/label timestamps use the guest's clock. */

@@ -590,14 +590,16 @@ private:
     struct PendingReads {
         static constexpr u64 Shifts[3] = {8, 14, 20};
         static constexpr u64 Limits[2] = {4_KB, 256_KB};
-        static constexpr u32 Bits = 16;
+        static constexpr u32 Bits = 12;
         std::array<std::vector<u64>, 3> tables{std::vector<u64>(1u << Bits),
                                                std::vector<u64>(1u << Bits),
                                                std::vector<u64>(1u << Bits)};
+        u64 max_packet = 0;
         static u64 Slot(u64 granule, u32 level) {
             return ((granule * 4 + level) * 0x9E3779B97F4A7C15ull) >> (64 - Bits);
         }
         void Note(VAddr address, u64 size, u64 packet) {
+            max_packet = std::max(max_packet, packet);
             const u32 level = size <= Limits[0] ? 0 : size <= Limits[1] ? 1 : 2;
             auto& table = tables[level];
             for (u64 g = address >> Shifts[level]; g <= (address + size - 1) >> Shifts[level];
@@ -607,6 +609,9 @@ private:
             }
         }
         u64 Newest(VAddr address, u64 size) const {
+            if (max_packet == 0) {
+                return 0;
+            }
             u64 newest = 0;
             for (u32 level = 0; level < 3; ++level) {
                 for (u64 g = address >> Shifts[level]; g <= (address + size - 1) >> Shifts[level];

@@ -27,6 +27,12 @@
 #include <time.h>
 #include <SDL3/SDL.h>
 #include <sys/stat.h>
+#ifdef __linux__
+#include <dirent.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#endif
 
 #define ERR_INVALID_ARG ((int32_t)0x80920001)
 #define ERR_INVALID_HANDLE ((int32_t)0x80920003)
@@ -792,12 +798,90 @@ static ABI int32_t pad_info(int32_t handle, ControllerInfo *info) {
     pthread_mutex_unlock(&lock);
     return 0;
 }
+#ifdef __linux__
+#include <linux/input.h>
+/* Steam Deck: while Steam is running, Steam Input owns the haptic motors via its virtual
+ * Xbox 360 evdev device and suppresses raw HIDAPI rumble on "Steam Deck Controller". Forward
+ * FF_RUMBLE ioctls to the virtual evdev pad so vibration works in both Desktop and Gaming Mode. */
+static int evdev_ff_fd = -1, evdev_ff_id = -1, evdev_ff_scanned = 0;
+static uint16_t evdev_last_strong = 0, evdev_last_weak = 0;
+static uint64_t evdev_last_us = 0;
+static void evdev_rumble(uint16_t strong, uint16_t weak, uint16_t duration_ms) {
+    if (evdev_ff_fd < 0 && !evdev_ff_scanned) {
+        evdev_ff_scanned = 1;
+        DIR *dir = opendir("/dev/input");
+        if (dir) {
+            struct dirent *de;
+            while ((de = readdir(dir)) != NULL) {
+                if (strncmp(de->d_name, "event", 5) != 0) continue;
+                char path[128];
+                snprintf(path, sizeof path, "/dev/input/%.64s", de->d_name);
+                int fd = open(path, O_RDWR | O_NONBLOCK);
+                if (fd < 0) continue;
+                unsigned long evbits[1] = {0};
+                char name[128] = {0};
+                if (ioctl(fd, EVIOCGBIT(0, sizeof evbits), evbits) >= 0 &&
+                    (evbits[0] & (1UL << EV_FF)) &&
+                    ioctl(fd, EVIOCGNAME(sizeof name), name) >= 0 &&
+                    (strstr(name, "X-Box 360") || strstr(name, "Xbox 360") || strstr(name, "Steam Virtual"))) {
+                    evdev_ff_fd = fd;
+                    printf("Runtime: Steam Deck evdev rumble bound to %s (%s)\n", path, name);
+                    break;
+                }
+                close(fd);
+            }
+            closedir(dir);
+        }
+    }
+    if (evdev_ff_fd < 0) return;
+    const uint64_t now = now_us();
+    if (strong == evdev_last_strong && weak == evdev_last_weak &&
+        (strong == 0 && weak == 0 ? 1 : (now - evdev_last_us < 400000))) {
+        return;
+    }
+    evdev_last_strong = strong;
+    evdev_last_weak = weak;
+    evdev_last_us = now;
+    if (strong == 0 && weak == 0) {
+        if (evdev_ff_id >= 0) {
+            struct input_event stop = {.type = EV_FF, .code = (uint16_t)evdev_ff_id, .value = 0};
+            ssize_t r = write(evdev_ff_fd, &stop, sizeof stop);
+            (void)r;
+        }
+        return;
+    }
+    struct ff_effect eff;
+    memset(&eff, 0, sizeof eff);
+    eff.type = FF_RUMBLE;
+    eff.id = (int16_t)evdev_ff_id;
+    eff.u.rumble.strong_magnitude = strong;
+    eff.u.rumble.weak_magnitude = weak;
+    eff.replay.length = duration_ms;
+    eff.replay.delay = 0;
+    if (ioctl(evdev_ff_fd, EVIOCSFF, &eff) == 0) {
+        evdev_ff_id = eff.id;
+        struct input_event play = {.type = EV_FF, .code = (uint16_t)evdev_ff_id, .value = 1};
+        ssize_t r = write(evdev_ff_fd, &play, sizeof play);
+        (void)r;
+    }
+}
+#endif
 static ABI int32_t pad_vibration(int32_t handle, const uint8_t *param) {
     if (!handle_open(handle)) return ERR_INVALID_HANDLE;
     if (!param) return ERR_INVALID_ARG;
+    const uint16_t strong = (uint16_t)(param[0] * 257);
+    const uint16_t weak = (uint16_t)(param[1] * 257);
     pthread_mutex_lock(&lock);
     SDL_Gamepad *g=handle==PAD_HANDLE ? current_gamepad() : port_gamepad(handle-1);
-    if (g) SDL_RumbleGamepad(g,(uint16_t)(param[0]*257),(uint16_t)(param[1]*257),1000);
+    if (g) SDL_RumbleGamepad(g, strong, weak, 1000);
+#ifdef __linux__
+    if (handle == PAD_HANDLE) {
+        const char *gname = g ? SDL_GetGamepadName(g) : NULL;
+        if (!gname || strstr(gname, "Steam") || strstr(gname, "Xbox") || strstr(gname, "X-Box")) {
+            evdev_rumble(strong, weak, 1000);
+        }
+    }
+#endif
     pthread_mutex_unlock(&lock);
     return 0;
 }
