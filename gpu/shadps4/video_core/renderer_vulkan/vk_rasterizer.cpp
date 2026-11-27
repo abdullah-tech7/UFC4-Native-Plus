@@ -917,7 +917,8 @@ void Rasterizer::NoteCommandWriteInOrder(VAddr addr, const void* data, u64 size)
 }
 
 bool Rasterizer::PendingWriteOverlaps(VAddr address, u64 size) {
-    if (!draw_pipe || size == 0) {
+    if (!draw_pipe || size == 0 || pending_write_table.max_packet == 0 ||
+        draw_pipe->ReachedPacket(pending_write_table.max_packet)) {
         return false;
     }
     const u64 packet = pending_write_table.Newest(address, size);
@@ -3383,6 +3384,12 @@ void Rasterizer::BindTextures(const Shader::Info& stage, const PreparedStage* pr
                     continue;
                 }
             }
+            const auto stage_mask =
+                stage.sw_stage == Shader::SwStage::Compute
+                    ? vk::PipelineStageFlagBits2::eComputeShader
+                    : (stage.sw_stage == Shader::SwStage::Fragment
+                           ? vk::PipelineStageFlagBits2::eFragmentShader
+                           : vk::PipelineStageFlagBits2::eAllGraphics);
             // The image is either bound as storage in a separate descriptor or bound as render
             // target in feedback loop. Depth images are excluded because they can't be bound as
             // storage and feedback loop doesn't make sense for them
@@ -3390,16 +3397,16 @@ void Rasterizer::BindTextures(const Shader::Info& stage, const PreparedStage* pr
                 if (instance.IsAttachmentFeedbackLoopLayoutSupported() && image.binding.is_target) {
                     barrier |= runtime.Transit(
                         &image, vk::ImageLayout::eAttachmentFeedbackLoopOptimalEXT,
-                        vk::PipelineStageFlagBits2::eAllGraphics, vk::AccessFlagBits2::eShaderRead);
+                        stage_mask, vk::AccessFlagBits2::eShaderRead);
                 } else {
                     barrier |= runtime.Transit(
-                        &image, vk::ImageLayout::eGeneral, vk::PipelineStageFlagBits2::eAllCommands,
+                        &image, vk::ImageLayout::eGeneral, stage_mask,
                         vk::AccessFlagBits2::eShaderRead | vk::AccessFlagBits2::eShaderWrite);
                 }
             } else {
                 if (is_storage) {
                     barrier |= runtime.Transit(
-                        &image, vk::ImageLayout::eGeneral, vk::PipelineStageFlagBits2::eAllCommands,
+                        &image, vk::ImageLayout::eGeneral, stage_mask,
                         vk::AccessFlagBits2::eShaderRead | vk::AccessFlagBits2::eShaderWrite,
                         desc.view_info.range);
                 } else {
@@ -3407,7 +3414,7 @@ void Rasterizer::BindTextures(const Shader::Info& stage, const PreparedStage* pr
                                                 ? vk::ImageLayout::eDepthStencilReadOnlyOptimal
                                                 : vk::ImageLayout::eShaderReadOnlyOptimal;
                     barrier |= runtime.Transit(
-                        &image, new_layout, vk::PipelineStageFlagBits2::eAllCommands,
+                        &image, new_layout, stage_mask,
                         vk::AccessFlagBits2::eShaderRead, desc.view_info.range);
                 }
             }
